@@ -94,8 +94,8 @@ export const config = {
     showJunctionMarkers: false,
     // Usar patch Bézier para suavizar a QUINA EXTERNA das junções
     useOuterBezierPatch: true,
-    // Usar arco interno para preencher o vão (padrão: desligado)
-    useInnerArcPatch: false,
+    // Usar arco interno para preencher o vão (padrão: ligado para arredondar quadras)
+    useInnerArcPatch: true,
     // Resolução do patch Bézier externo (nº de amostras)
     outerBezierSampleCount: 32,
     // Raio absoluto das curvas externas em metros e sua faixa permitida
@@ -105,6 +105,12 @@ export const config = {
     showZoneOverlay: false,
     zoneOverlayAlpha: 0.12,
     zoneOverlayTileM: 250,
+    blockCorner: {
+        outlineEnabled: true,
+        outlineColor: 0x1B5E20,
+        outlineAlpha: 0.55,
+        outlineWidth: 3,
+    },
     zoneColors: {
     downtown: 0xFF8A65,
         residential: 0x4FC3F7,
