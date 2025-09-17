@@ -447,14 +447,16 @@ const GameCanvas: React.FC = () => {
                         const stepsBase = 64;
                         const steps = Math.max(10, Math.ceil(Math.abs(dth) * stepsBase / Math.PI));
 
-                        // Polígono: arco de I1->I2 + corda I2->I1 (segmento circular curto)
-                        const poly: Point[] = [];
+                        // Arco interno discretizado: pontos de I1 -> I2 seguindo a bissetriz interna
+                        const arcPoints: Point[] = [];
                         for (let i = 0; i <= steps; i++) {
                             const u = i / steps;
                             const ang = th1 + dth * u;
-                            poly.push({ x: C.x + Math.cos(ang) * r, y: C.y + Math.sin(ang) * r });
+                            arcPoints.push({ x: C.x + Math.cos(ang) * r, y: C.y + Math.sin(ang) * r });
                         }
-                        poly.push(I1); // fecha com a corda (I2 já é o último do arco)
+
+                        // Polígono completo: arco + corda retornando a I1
+                        const poly: Point[] = [...arcPoints, I1];
 
                         const color = s1.q.color ?? 0xA1AFA9; // cor da primeira via (suficiente)
                         const g = new PIXI.Graphics();
@@ -466,6 +468,18 @@ const GameCanvas: React.FC = () => {
                         g.closePath();
                         g.endFill();
                         dynamicDrawables.current?.addChild(g);
+
+                        // Desenhar a borda arredondada do quarteirão (apenas o arco)
+                        if (config.render.blockCorner?.outlineEnabled) {
+                            const outline = new PIXI.Graphics();
+                            const outlineConf = config.render.blockCorner;
+                            outline.lineStyle(outlineConf.outlineWidth, outlineConf.outlineColor, outlineConf.outlineAlpha);
+                            arcPoints.forEach((wp, idx) => {
+                                const sp = worldToIso(wp);
+                                if (idx === 0) outline.moveTo(sp.x, sp.y); else outline.lineTo(sp.x, sp.y);
+                            });
+                            dynamicDrawables.current?.addChild(outline);
+                        }
                     }
 
                     // === Curva Bézier cúbica aproximando o mesmo arco (debug, lado INTERNO) ===
